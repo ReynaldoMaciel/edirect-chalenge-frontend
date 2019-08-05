@@ -24,6 +24,7 @@
                     placeholder="Email"
                     type="email"
                     name="email"
+                    icon="email"
                   >
                   </b-input>
                 </b-field>
@@ -41,13 +42,14 @@
                     type="password"
                     name="password"
                     :password-reveal="true"
+                    icon="lock"
                   >
                   </b-input>
                 </b-field>
                 <br />
                 <div class="control">
                   <button
-                    class="button is-medium is-fullwidth bg_first color_white is-rounded"
+                    class="button is-medium is-fullwidth is-rounded is-primary"
                     @click="authenticate"
                   >
                     Login
@@ -57,7 +59,7 @@
                     :to="{ name: 'cadastro' }"
                     class="buttons is-centered"
                   >
-                    <div class="button is-danger is-small is-outlined">
+                    <div class="button is-primary is-small is-outlined">
                       I don't have an account
                     </div>
                   </router-link>
@@ -73,6 +75,7 @@
 
 <script>
 import { mapFields } from 'vuex-map-fields'
+import { mapActions } from 'vuex'
 import api from '@/services/api'
 
 export default {
@@ -88,28 +91,45 @@ export default {
     // this.password = '123qwe'
   },
   methods: {
-    async login() {
-      let { email, password } = this
-      let result = await api.post('user/login', { email, password })
-      console.log(result)
-    },
-    authenticate() {
+    ...mapActions('token', [
+      'setToken'
+    ]),
+    async authenticate() {
       try {
-        this.$validator.validateAll().then(validated => {
-          if (!validated) {
-            this.$toast.open({
-              duration: 5000,
-              message:
-                'Fill all fields correctly before continue',
-              position: 'is-bottom',
-              type: 'is-danger'
-            })
-            return
-          }
-          this.login()
-        })
+        let allFieldsValidated = await this.$validator.validateAll()
+        if (allFieldsValidated) {
+          let { email, password } = this
+          let response = await api.post('user/login', { email, password })
+          if (response.status !== 200) throw new Error()
+          this.$toast.open({
+            duration: 5000,
+            message:
+              'Logged successfuly',
+            position: 'is-top',
+            type: 'is-success'
+          })
+          this.setToken(response.data.token)
+          this.$router.push({ name: 'dashboard' })
+        } else {
+          this.$toast.open({
+            duration: 5000,
+            message:
+              'Fill all fields correctly before continue',
+            position: 'is-top',
+            type: 'is-danger'
+          })
+        }
       } catch (error) {
-        this.$swal('Ops..', 'Error on login', 'error')
+        let message = error.message ? error.message : 'Unknown error'
+        if (error.isAxiosError) {
+          message = error.response.data
+        }
+        this.$toast.open({
+          duration: 5000,
+          message: message,
+          position: 'is-top',
+          type: 'is-danger'
+        })
       }
     }
   }
