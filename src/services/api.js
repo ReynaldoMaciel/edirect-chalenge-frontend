@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 let api = axios.create({
-  baseURL: 'https://localhost:3001/',
+  baseURL: 'https://chalenge-edirect-backend.herokuapp.com/',
   timeout: 5000
 });
 
