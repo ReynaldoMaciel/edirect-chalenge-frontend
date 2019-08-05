@@ -41,6 +41,7 @@
                 placeholder="Email"
                 type="email"
                 name="email"
+                icon="email"
               >
               </b-input>
             </b-field>
@@ -58,6 +59,7 @@
                 type="password"
                 name="password"
                 :password-reveal="true"
+                icon="lock"
               >
               </b-input>
             </b-field>
@@ -75,18 +77,19 @@
                 type="password"
                 name="confirmation_password"
                 :password-reveal="true"
+                icon="lock"
               >
               </b-input>
             </b-field>
             <button
-              class="button is-medium is-fullwidth is-rounded"
+              class="button is-medium is-fullwidth is-rounded is-primary"
               @click="register()"
             >
               Register
             </button>
             <br />
             <router-link :to="{ name: 'login' }" class="buttons is-centered">
-              <div class="button is-danger is-small is-outlined">
+              <div class="button is-primary is-small is-outlined">
                 I already have an account
               </div>
             </router-link>
@@ -99,17 +102,10 @@
 
 <script>
 import { mapFields } from 'vuex-map-fields'
+import api from '@/services/api'
 
 export default {
   name: 'Register',
-  data() {
-    return {
-      loadingCep: false,
-      disableCidade: true,
-      loadingCidades: false,
-      cidades: []
-    }
-  },
   computed: {
     ...mapFields('user', [
       'name',
@@ -119,27 +115,47 @@ export default {
     ]),
   },
   created() {
-    this.name = 'Reynaldo'
-    this.email = 'r@r.com'
-    this.password = '123qwe'
-    this.confirmation_password = '123qwe'
+    // this.name = 'Reynaldo Marinho Monteiro Maciel'
+    // this.email = 'r@r.com'
+    // this.password = '123qwe'
+    // this.confirmation_password = '123qwe'
   },
   methods: {
-    register() {
+    async register() {
       try {
-        this.$validator.validateAll().then(validated => {
-          if (!validated) {
-            this.$toast.open({
-              duration: 5000,
-              message:
-                'Fill all fields correctly before continue',
-              position: 'is-top',
-              type: 'is-danger'
-            })
-          }
-        })
+        let allFieldsValidated = await this.$validator.validateAll()
+        if (allFieldsValidated) {
+          let { name, email, password } = this
+          let response = await api.post('user/register', { name, email, password })
+          if (response.status !== 201) throw new Error()
+          this.$toast.open({
+            duration: 5000,
+            message:
+              'User created',
+            position: 'is-top',
+            type: 'is-success'
+          })
+          this.$router.push({ name: 'login' })
+        } else {
+          this.$toast.open({
+            duration: 5000,
+            message:
+              'Fill all fields correctly before continue',
+            position: 'is-top',
+            type: 'is-danger'
+          })
+        }
       } catch (error) {
-        this.$swal('Ops..', 'Error on register', 'error')
+        let message = error.message ? error.message : 'Unknown error'
+        if (error.isAxiosError) {
+          message = error.response.data
+        }
+        this.$toast.open({
+          duration: 5000,
+          message: message,
+          position: 'is-top',
+          type: 'is-danger'
+        })
       }
     }
   }
