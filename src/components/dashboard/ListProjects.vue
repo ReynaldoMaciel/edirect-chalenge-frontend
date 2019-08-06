@@ -42,6 +42,7 @@
             :message="errors.first('name')"
           >
             <b-input
+              autofocus="true"
               ref="name"
               v-model="name"
               v-validate="'required'"
