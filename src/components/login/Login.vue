@@ -101,6 +101,8 @@ export default {
           let { email, password } = this
           let response = await api.post('user/login', { email, password })
           if (response.status !== 200) throw new Error()
+          this.setToken(response.data.token)
+          this.$router.push({ name: 'dashboard' })
           this.$toast.open({
             duration: 5000,
             message:
@@ -108,8 +110,6 @@ export default {
             position: 'is-top',
             type: 'is-success'
           })
-          this.setToken(response.data.token)
-          this.$router.push({ name: 'dashboard' })
         } else {
           this.$toast.open({
             duration: 5000,
