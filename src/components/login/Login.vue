@@ -56,7 +56,7 @@
                   </button>
                   <br />
                   <router-link
-                    :to="{ name: 'cadastro' }"
+                    :to="{ name: 'register' }"
                     class="buttons is-centered"
                   >
                     <div class="button is-primary is-small is-outlined">
@@ -99,7 +99,7 @@ export default {
         let allFieldsValidated = await this.$validator.validateAll()
         if (allFieldsValidated) {
           let { email, password } = this
-          let response = await api.post('user/login', { email, password })
+          let response = await api().post('user/login', { email, password })
           if (response.status !== 200) throw new Error()
           this.setToken(response.data.token)
           this.$router.push({ name: 'dashboard' })
@@ -121,9 +121,6 @@ export default {
         }
       } catch (error) {
         let message = error.message ? error.message : 'Unknown error'
-        if (error.isAxiosError) {
-          message = error.response.data
-        }
         this.$toast.open({
           duration: 5000,
           message: message,

@@ -101,7 +101,7 @@ export default {
     }),
     async removeTaskById(idTask) {
       try {
-        let response = await api.delete(`task/${idTask}`)
+        let response = await api().delete(`task/${idTask}`)
         if (response.status !== 200) throw new Error(response.data.message)
         this.removeTask(response.data)
       } catch (error) {
@@ -116,7 +116,7 @@ export default {
     async updateTaskOnBlur (idTask) {
       try {
         let { description, idProject } = this.listTasks.find(task => task.idTask === idTask)
-        let response = await api.put(`task/${idTask}`, { description })
+        let response = await api().put(`task/${idTask}`, { description })
         if (response.status !== 200) throw new Error(response.data.message)
         // this.$toast.open({
         //   duration: 5000,
@@ -139,7 +139,7 @@ export default {
     },
     async refreshTasks(idProject) {
       try {
-        let response = await api.get(`tasksByProject/${idProject}`)
+        let response = await api().get(`tasksByProject/${idProject}`)
         this.removeAllTasksByProject(idProject)
         this.addTasks(response.data)
       } catch (error) {
@@ -153,7 +153,7 @@ export default {
     },
     async markAsDone (idTask) {
       try {
-        let response = await api.put(`task/${idTask}`, { done: true })
+        let response = await api().put(`task/${idTask}`, { done: true })
         if (response.status !== 200) throw new Error(response.data.message)
         this.refreshTasks(response.data.idProject)
       } catch (error) {
@@ -178,7 +178,7 @@ export default {
         let allFieldsValidated = await this.$validator.validateAll()
         if (allFieldsValidated) {
           let { description, idProject } = this
-          let response = await api.post(`task`, { description, idProject })
+          let response = await api().post(`task`, { description, idProject })
           if (response.status !== 201) throw new Error(response.data.message)
           this.addTask(response.data)
           this.showModal = false

@@ -126,7 +126,7 @@ export default {
         let allFieldsValidated = await this.$validator.validateAll()
         if (allFieldsValidated) {
           let { name, email, password } = this
-          let response = await api.post('user/register', { name, email, password })
+          let response = await api().post('user/register', { name, email, password })
           if (response.status !== 201) throw new Error()
           this.$toast.open({
             duration: 5000,

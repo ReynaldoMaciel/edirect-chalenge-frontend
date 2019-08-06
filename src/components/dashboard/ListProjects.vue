@@ -100,7 +100,7 @@ export default {
           })  
           return
         }
-        let response = await api.delete(`project/${idProject}`)
+        let response = await api().delete(`project/${idProject}`)
         if (response.status !== 200 && response.data !== 1) throw new Error(response.data.message)
         this.removeProject(idProject)
       } catch (error) {
@@ -121,7 +121,7 @@ export default {
         let allFieldsValidated = await this.$validator.validateAll()
         if (allFieldsValidated) {
           let { name } = this
-          let response = await api.put(`project/${this.idProject}`, { name })
+          let response = await api().put(`project/${this.idProject}`, { name })
           if (response.status !== 200) throw new Error(response.data.message)
           this.updateProject(response.data)
           this.$toast.open({
@@ -162,7 +162,7 @@ export default {
       try {
         this.removeAllTasksByProject(idProject)
         if(!open) {
-          let response = await api.get(`tasksByProject/${idProject}`)
+          let response = await api().get(`tasksByProject/${idProject}`)
           this.addTasks(response.data)
         }
       } catch (error) {

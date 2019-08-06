@@ -1,5 +1,16 @@
 <template>
   <div class="Dashboard">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons" @click="logout">
+            <a class="button is-light">
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
     <div class="hero-body">
       <div class="container">
         <div class="column">
@@ -69,7 +80,8 @@ export default {
     ...mapFields('project', ['name'])
   },
   mounted() {
-    api.get('projects').then(response => {
+    api().get('projects').then(response => {
+      this.removeAllProjects()
       this.addProjects(response.data)
     }).catch(error => {
       this.$toast.open({
@@ -83,8 +95,16 @@ export default {
   methods: {
     ...mapActions('project', [
       'addProjects',
-      'addProject'
+      'addProject',
+      'removeAllProjects'
     ]),
+    ...mapActions('token', [
+      'deleteToken'
+    ]),
+    logout () {
+      this.deleteToken()
+      this.$router.push({ name: 'login' })
+    },
     openModalCreateProject () {
       this.showModalCreateProject = true
       this.name = ''
@@ -94,7 +114,7 @@ export default {
         let allFieldsValidated = await this.$validator.validateAll()
         if (allFieldsValidated) {
           let { name } = this
-          let response = await api.post('project', { name })
+          let response = await api().post('project', { name })
           if (response.status !== 201) throw new Error(response.message)
           this.addProject(response.data)
           this.$toast.open({

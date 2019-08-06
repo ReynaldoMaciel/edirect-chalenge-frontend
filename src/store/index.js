@@ -24,7 +24,7 @@ const store = new Vuex.Store({
   actions,
   mutations,
   strict: false,
-  // Módulos que são usados pelo "vuex-persistedstate" precisam ser carregados previamente
+  // Módules used by "vuex-persistedstate" needs to be loaded previously
   modules: {
     token,
   },
