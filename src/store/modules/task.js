@@ -33,7 +33,8 @@ const mutations = {
     })
   },
   REMOVE_TASK (state, payload) {
-    state.listTasks = payload
+    let taskIndex = state.listTasks.findIndex(task => task.idTask === payload.idTask)
+    state.listTasks.splice(taskIndex, 1)
   },
   REMOVE_ALL_TASKS (state, payload) {
     state.listTasks = []
@@ -54,8 +55,8 @@ const actions = {
   updateTask ({ commit }, payload) {
     commit('UPDATE_TASK', payload)
   },
-  deleteTask ({ commit }, payload) {
-    commit('UPDATE_TASK', payload)
+  removeTask ({ commit }, payload) {
+    commit('REMOVE_TASK', payload)
   },
   removeAllTasks ({ commit }) {
     commit('REMOVE_ALL_TASKS')

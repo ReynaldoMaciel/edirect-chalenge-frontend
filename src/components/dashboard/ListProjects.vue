@@ -90,7 +90,15 @@ export default {
     }),
     async confirmRemoveProject (idProject) {
       try {
-        // TODO: Check if project has tasks
+        if (this.listTasks.length > 0) {
+          this.$toast.open({
+            duration: 5000,
+            message: 'Can not delete project with tasks',
+            position: 'is-top',
+            type: 'is-warning'
+          })  
+          return
+        }
         let response = await api.delete(`project/${idProject}`)
         if (response.status !== 200 && response.data !== 1) throw new Error(response.data.message)
         this.removeProject(idProject)
@@ -169,6 +177,7 @@ export default {
   computed: {
     ...mapState({
       listProjects: state => state.project.listProjects,
+      listTasks: state => state.task.listTasks,
       idProject: state => state.project.idProject
     }),
     ...mapFields('project', ['name'])

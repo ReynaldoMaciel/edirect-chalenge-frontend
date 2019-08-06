@@ -2,23 +2,32 @@
   <div class="ListTasks">
     <h5>To Do</h5>
     <ul class="list_tasks">
-      <li v-for="task in notDoneTasks(idProject)" :key="task.idTask">
-        <b-checkbox @input="markAsDone(task.idTask)">
-          <p>
-            {{ task.description }}
-          </p>
-        </b-checkbox>
+      <li v-for="task in notDoneTasks(idProject)" :key="task.idTask" class="is-flex item_task">
+        <div class="is-flex item_task_description">
+          <b-checkbox @input="markAsDone(task.idTask)">
+          </b-checkbox>
+          <!-- <span>{{ task.description }}</span> -->
+          <input type="text" class="input_edit_inline" @blur="updateTaskOnBlur(task.idTask)" v-model="task.description"/>
+        </div>
+        <div class="is-flex item_actions">
+          <b-button class="is-small is-danger" @click="removeTaskById(task.idTask)">
+            <b-icon
+              icon="delete"
+            />
+          </b-button>
+        </div>
       </li>
       <li>
-        <b-button type="is-small" @click="showModalAddTask">
-          Add
-        </b-button>
+        <button class="is-small button is-success" @click="showModalAddTask">
+          <b-icon icon="plus"></b-icon>
+          <span>Add task</span>
+        </button>
       </li>
     </ul>
     <h5>Done</h5>
     <ul class="list_tasks">
       <li v-for="task in doneTasks(idProject)" :key="task.idTask" class="list_item_done">
-        <b-checkbox :disabled="true" :value="task.finishDate ? true : false" @input="markAsDone(task.idTask)">
+        <b-checkbox :disabled="true" :value="task.finishDate ? true : false">
           {{ task.description }}
         </b-checkbox>
       </li>
@@ -58,7 +67,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import api from '@/services/api'
 
@@ -80,8 +89,48 @@ export default {
       addTask: 'task/addTask',
       addTasks: 'task/addTasks',
       updateTask: 'task/updateTask',
+      removeTask: 'task/removeTask',
+      resetNameTask: 'task/resetNameTask',
       removeAllTasksByProject: 'task/removeAllTasksByProject',
     }),
+    async removeTaskById(idTask) {
+      try {
+        let response = await api.delete(`task/${idTask}`)
+        if (response.status !== 200) throw new Error(response.data.message)
+        this.removeTask(response.data)
+      } catch (error) {
+        this.$toast.open({
+          duration: 5000,
+          message: error.message ? error.message : 'Error on delete task',
+          position: 'is-top',
+          type: 'is-danger'
+        })
+      }
+    },
+    async updateTaskOnBlur (idTask) {
+      try {
+        let { description, idProject } = this.listTasks.find(task => task.idTask === idTask)
+        let response = await api.put(`task/${idTask}`, { description })
+        if (response.status !== 200) throw new Error(response.data.message)
+        // this.$toast.open({
+        //   duration: 5000,
+        //   message:
+        //     'Task updated',
+        //   position: 'is-top',
+        //   type: 'is-success'
+        // })
+      } catch (error) {
+        let { idProject } = this.listTasks.find(task => task.idTask === idTask)
+        this.refreshTasks(idProject)
+        this.$toast.open({
+          duration: 5000,
+          message: error.message ? error.message : 'Error on update task',
+          position: 'is-top',
+          type: 'is-danger'
+        })
+      }
+      // this.updateTask({ idTask, description })
+    },
     async refreshTasks(idProject) {
       try {
         let response = await api.get(`tasksByProject/${idProject}`)
@@ -115,6 +164,7 @@ export default {
       }
     },
     showModalAddTask () {
+      this.description = ''
       this.showModal = true
     },
     async confirmAddTask() {
@@ -153,6 +203,9 @@ export default {
       notDoneTasks: 'task/notDone',
       doneTasks: 'task/done'
     }),
+    ...mapState({
+      listTasks: state => state.task.listTasks
+    }),
     ...mapFields('task', ['description'])
   },
 }
@@ -160,9 +213,33 @@ export default {
 
 <style>
 .list_tasks{
-  /* list-style-type: none !important; */
+  list-style-type: none !important;
 }
 .list_item_done{
   text-decoration: line-through
+}
+.item_task{
+  background-color: #f9f9f9;
+  padding: 6px;
+  flex-direction: row;
+  justify-content: space-between
+}
+.item_task_description{
+  align-items: center;
+  width: 100%;
+}
+.item_actions button{
+  margin-right: 2px;
+}
+.input_edit_inline{
+  background-color: inherit;
+  border: none;
+  font-size: 1em;
+  width: 100%;
+}
+.input_edit_inline:focus{
+  background-color: inherit;
+  border: none;
+  outline: none;
 }
 </style>

@@ -6,7 +6,7 @@
           <h1 class="is-size-4 has-text-weight-bold is-pulled-left">
             Projects
           </h1>
-          <b-button type="is-info is-medium is-pulled-right" @click="() => showModalCreateProject = true">
+          <b-button type="is-info is-medium is-pulled-right" @click="openModalCreateProject">
             Create Project
           </b-button>
         </div>
@@ -67,7 +67,7 @@ export default {
   computed: {
     ...mapFields('project', ['name'])
   },
-  created() {
+  mounted() {
     api.get('projects').then(response => {
       this.addProjects(response.data)
     }).catch(error => {
@@ -84,6 +84,10 @@ export default {
       'addProjects',
       'addProject'
     ]),
+    openModalCreateProject () {
+      this.showModalCreateProject = true
+      this.name = ''
+    },
     async createProject () {
       try {
         let allFieldsValidated = await this.$validator.validateAll()
