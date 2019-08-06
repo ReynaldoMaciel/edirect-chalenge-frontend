@@ -26,10 +26,15 @@
     </ul>
     <h5>Done</h5>
     <ul class="list_tasks">
-      <li v-for="task in doneTasks(idProject)" :key="task.idTask" class="list_item_done">
-        <b-checkbox :disabled="true" :value="task.finishDate ? true : false">
-          {{ task.description }}
-        </b-checkbox>
+      <li v-for="task in doneTasks(idProject)" :key="task.idTask" class="is-flex item_done">
+        <div>
+          <b-checkbox :disabled="true" :value="task.finishDate ? true : false">
+            <span class="list_item_done">{{ task.description }}</span>
+          </b-checkbox>
+        </div>
+        <div>
+          <span> finished at {{ new Date(task.finishDate).toLocaleString() }}</span>
+        </div>
       </li>
     </ul>
     <b-modal :active.sync="showModal" :width="640" scroll="keep">
@@ -215,6 +220,7 @@ export default {
 <style>
 .list_tasks{
   list-style-type: none !important;
+  list-style-position: unset;
 }
 .list_item_done{
   text-decoration: line-through
@@ -242,5 +248,9 @@ export default {
   background-color: inherit;
   border: none;
   outline: none;
+}
+.item_done{
+  background-color: #f9f9f9;
+  justify-content: space-between;
 }
 </style>
