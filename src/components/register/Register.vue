@@ -22,7 +22,7 @@
                 v-model="name"
                 v-validate="'required'"
                 autocomplete="off"
-                placeholder="Nome"
+                placeholder="Name"
                 type="text"
                 name="name"
               >
