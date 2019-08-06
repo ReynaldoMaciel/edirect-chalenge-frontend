@@ -9,7 +9,7 @@ const Login = () => import('../components/login/Login')
 const Dashboard = () => import('../components/dashboard/Dashboard')
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   routes: [
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
